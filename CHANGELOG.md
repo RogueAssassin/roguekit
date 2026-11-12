@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0
+
+- `rust-oxide-carbon` skill rewritten for the real stack: Facepunch Rust on Unity, C# only (legacy Oxide Lua/JS/Python noted as unmaintained), Oxide vs Carbon (modern C# and Harmony) targeting, main-thread and lifecycle rules, hook return semantics and hot-path performance.
+- IDE support: reference-only `.csproj`, `.editorconfig`, VS Code task, Visual Studio/Rider/VS Code notes, how to use Claude Code IDE selection and diagnostics, and a diagnostics table.
+- New on-demand references: `ide-setup.md`, `plugin-templates.md` (Oxide, Carbon, Harmony, dual-framework) and `review-checklist.md`.
+
 ## 1.0.0
 
 First release under the RogueKit name (continues the earlier "ClaudePack" 2.x line).
