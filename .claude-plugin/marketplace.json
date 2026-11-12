@@ -1,0 +1,12 @@
+{
+  "name": "roguekit",
+  "description": "RogueKit: a lean, token-conscious toolkit for Claude Code. All content is plain files you can read before installing.",
+  "owner": { "name": "RogueKit contributors" },
+  "plugins": [
+    {
+      "name": "roguekit",
+      "source": "./plugin",
+      "description": "Engineering skills, review/debug/architecture agents with Sonnet/Opus routing, and a local token-saver hook. No network access."
+    }
+  ]
+}

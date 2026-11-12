@@ -1,0 +1,12 @@
+# Local state and notes
+.roguekit/
+*.log
+*.bak
+*.tmp
+scratch/
+
+# OS / editor
+Thumbs.db
+Desktop.ini
+.vscode/
+.idea/
