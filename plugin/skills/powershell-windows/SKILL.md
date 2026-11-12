@@ -12,3 +12,4 @@ description: Use for PowerShell scripts, Windows automation, installers, packagi
 - Do not weaken execution policy persistently. If a process-scoped bypass is needed, explain it and keep its scope limited to that PowerShell process.
 - Never embed credentials. Avoid logging secrets and validate downloaded artifacts before execution.
 - Test syntax and behaviour on the declared PowerShell versions; do not claim execution testing if only static inspection was performed.
+- Before finishing, and whenever asked to find errors or speed something up, read `references/quality-and-performance.md` in this skill: it lists the cheapest verification commands, common error classes, how to measure, and alternatives to try. Measure before changing; report before/after.

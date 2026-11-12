@@ -9,3 +9,4 @@ description: Use for frontend applications, React, TypeScript, component archite
 - Include loading, empty, error, success and validation states where relevant.
 - Avoid unnecessary dependencies, excessive client-side JavaScript and avoidable re-renders.
 - Verify changes in the actual browser or existing visual test tooling when available; otherwise state what was not visually verified. For live browser checks, see the mcp-plugins skill (Playwright / Chrome DevTools MCP, opt-in).
+- Before finishing, and whenever asked to find errors or speed something up, read `references/quality-and-performance.md` in this skill: it lists the cheapest verification commands, common error classes, how to measure, and alternatives to try. Measure before changing; report before/after.

@@ -9,3 +9,5 @@ description: Use for profiling, performance investigations, memory usage, alloca
 - Avoid speculative caching or complexity without evidence and a safe invalidation strategy.
 - Preserve correctness and observability; compare before/after measurements using equivalent workloads.
 - Report trade-offs, measurement limits and regressions checked.
+- Language-specific verification commands and optimisation alternatives live in `references/quality-and-performance.md` of the matching skill (dotnet-csharp, java-development, python-development, powershell-windows, frontend-ui-ux, sql-database; for Rust plugins see rust-oxide-carbon). Use those after you have a baseline.
+- Change one thing at a time, keep the old version for comparison, and stop when the goal is met.

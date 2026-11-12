@@ -10,3 +10,4 @@ description: Use for Python applications, libraries, APIs, automation, packaging
 - Follow existing FastAPI, Django, Flask or CLI conventions rather than introducing a new framework.
 - Use the existing test suite; consider pytest, Ruff and mypy when already configured.
 - Avoid unnecessary dependencies and check compatibility/security before upgrades.
+- Before finishing, and whenever asked to find errors or speed something up, read `references/quality-and-performance.md` in this skill: it lists the cheapest verification commands, common error classes, how to measure, and alternatives to try. Measure before changing; report before/after.

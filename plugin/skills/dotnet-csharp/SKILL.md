@@ -11,3 +11,4 @@ description: Use for C#, .NET, ASP.NET Core, EF Core, Windows desktop applicatio
 - Consider Windows-specific lifecycle, process ownership, file locking, permissions and path handling in desktop/server tools.
 - Add or update tests using the existing test framework. Run relevant tests, `dotnet build`, and formatting/analyzers when configured.
 - Check package compatibility and release notes before upgrading dependencies or target frameworks.
+- Before finishing, and whenever asked to find errors or speed something up, read `references/quality-and-performance.md` in this skill: it lists the cheapest verification commands, common error classes, how to measure, and alternatives to try. Measure before changing; report before/after.

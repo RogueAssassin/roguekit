@@ -12,3 +12,4 @@ description: Use for Java, Spring Boot, Maven, Gradle, Hibernate, JVM applicatio
 - Consider thread safety, concurrency, resource lifecycle and N+1 database queries.
 - Use the project's existing test framework and run relevant Maven/Gradle tests and builds.
 - Check dependency compatibility and security before upgrades; prefer official Java and Spring documentation.
+- Before finishing, and whenever asked to find errors or speed something up, read `references/quality-and-performance.md` in this skill: it lists the cheapest verification commands, common error classes, how to measure, and alternatives to try. Measure before changing; report before/after.

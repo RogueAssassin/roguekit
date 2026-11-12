@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.0
+
+- New on-demand `references/quality-and-performance.md` for `dotnet-csharp`, `java-development`, `python-development`, `powershell-windows`, `frontend-ui-ux` and `sql-database`: cheapest verification commands, common error classes, how to measure, and a table of performance alternatives to try.
+- `performance-review` now points to those references. No new always-on cost beyond one added line per skill body.
+
 ## 1.1.0
 
 - `rust-oxide-carbon` skill rewritten for the real stack: Facepunch Rust on Unity, C# only (legacy Oxide Lua/JS/Python noted as unmaintained), Oxide vs Carbon (modern C# and Harmony) targeting, main-thread and lifecycle rules, hook return semantics and hot-path performance.
