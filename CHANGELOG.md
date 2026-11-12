@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1
+
+- Installer: `Doctor` and `Status` no longer report the plugin as missing on Claude Code 2.1.3xx, where `claude plugin list` uses a different pointer glyph that Windows PowerShell 5.1 garbles. The plugin entry is now matched by its `name@marketplace` line.
+
 ## 1.2.0
 
 - New on-demand `references/quality-and-performance.md` for `dotnet-csharp`, `java-development`, `python-development`, `powershell-windows`, `frontend-ui-ux` and `sql-database`: cheapest verification commands, common error classes, how to measure, and a table of performance alternatives to try.

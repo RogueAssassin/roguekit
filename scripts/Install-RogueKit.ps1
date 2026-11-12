@@ -312,8 +312,14 @@ function Get-PluginBlock {
     # Returns the 'claude plugin list' text block for this plugin, or $null.
     if (!(Test-Claude)) { return $null }
     $pl = (Invoke-ClaudeCli @('plugin', 'list')).Output
-    foreach ($b in ($pl -split '(?m)^\s*>\s*')) { if ($b -match "^$PluginName@$MarketplaceName") { return $b } }
-    return $null
+    # Entries start with a short pointer ('>' or a glyph that Windows PowerShell may garble into
+    # 1-3 characters) followed by 'name@marketplace'. Match on the name line, not the glyph.
+    $m = [regex]::Match($pl, '(?m)^\s*\S{1,3}\s+' + [regex]::Escape("$PluginName@$MarketplaceName") + '\s*\r?$')
+    if (!$m.Success) { return $null }
+    $rest = $pl.Substring($m.Index)
+    $next = [regex]::Match($rest.Substring($m.Length), '(?m)^\s*\S{1,3}\s+[\w.-]+@[\w.-]+\s*\r?$')
+    if ($next.Success) { return $rest.Substring(0, $m.Length + $next.Index) }
+    return $rest
 }
 
 # ---------------------------------------------------------------------------
