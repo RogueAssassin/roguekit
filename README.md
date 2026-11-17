@@ -8,7 +8,7 @@ RogueKit is an independent community project. It is not affiliated with or endor
 
 | Part | What it is | Context cost |
 |---|---|---|
-| **Plugin `roguekit`** | 20 skills, 5 agents, 1 hook, installed through Claude Code's native plugin system | Skill/agent *descriptions* only; skill bodies load when used |
+| **Plugin `roguekit`** | 26 skills, 5 agents, 1 hook, installed through Claude Code's native plugin system | Skill/agent *descriptions* only; skill bodies load when used |
 | **Global rules** | One marked block appended to your `~/.claude/CLAUDE.md` (the one thing a plugin cannot ship) | About 1.3k tokens every session |
 | **Installer** | `scripts/Install-RogueKit.ps1`: install, doctor, audit, uninstall, optional extras | None |
 
@@ -30,6 +30,9 @@ Skills load on demand. Claude picks them when the task matches their description
 | `dotnet-csharp`, `java-development`, `python-development`, `rust-oxide-carbon`, `powershell-windows` | Language and platform guidance |
 | `frontend-ui-ux`, `sql-database`, `azure-cloud`, `api-automation`, `git-github-ci` | Frontend, data, cloud, APIs, Git/CI |
 | `game-server-tooling` | Dedicated game server managers, SteamCMD, RCON |
+| `commsatlas` | Coding, testing and releasing the CommsAtlas rack/patch documentation platform |
+| `selfhosted-containers`, `linux-server-admin` | Docker/Podman Compose services and update scripts; lockout-safe SSH, firewall, nginx, systemd, cleanup |
+| `php-wordpress`, `flutter-dart`, `android-root-modules` | WordPress/PHP plugins and themes; Flutter apps; Android root modules and companion apps |
 | `security-review`, `performance-review` | Security audits and profiling-led optimisation |
 
 ### Agents

@@ -49,3 +49,8 @@ Project scaffolding for Visual Studio, Rider and VS Code (a reference-only `.csp
 - Never deploy to, restart, or run commands on a live server without explicit approval. Do not put RCON passwords or API keys in plugin code, examples or commits.
 - Report separately what was compiled, what was run, and what is an unverified runtime assumption.
 - Release hygiene: keep the `[Info]` version, changelog, README/uMod page text and CI metadata consistent.
+
+## Extensions and reference data
+- **Oxide extensions** (`Oxide.Ext.*` DLL projects, as opposed to `.cs` plugins) are compiled assemblies loaded at server start: build them against the exact Oxide/Rust references, keep a `VERSION` and update manifest in step with the changelog, and expect that an extension is not hot-reloadable like a plugin. Keep the extension thin; put game logic in plugins. Check the repo's `Directory.Build.props`/`References` setup before changing targets.
+- **Cross-referencing**: if a checkout of `Rust-Reference-AutoUpdated` is available (item, convar, command, entity, prefab and blueprint JSON), search its `data/` folder to verify shortnames, prefab paths and convars instead of guessing, and note its refresh date.
+- Plugin collections that ship for both Oxide and Carbon should share one README/changelog and state which framework each plugin was tested on.

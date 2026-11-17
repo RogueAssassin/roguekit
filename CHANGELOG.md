@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.4.0
+
+- New skills derived from the maintainer's repositories and sessions: `selfhosted-containers`, `linux-server-admin` (lockout-safe SSH port changes), `php-wordpress`, `flutter-dart`, `android-root-modules`.
+- `rust-oxide-carbon`: Oxide extension (DLL) guidance and use of the Rust reference data for verification. `git-github-ci`: release hygiene (version, changelog, checksums, upload lists).
+
+## 1.3.0
+
+- New `commsatlas` skill: architecture, build/test/release workflow (`--selftest`, `build.ps1 -Test`, `.run` installer, `BUILD-LOG.md`), and project rules (no live deploys without approval, read-only UniFi connector, tenant and auth safety, no real customer data) for coding and updating CommsAtlas.
+
 ## 1.2.1
 
 - Installer: `Doctor` and `Status` no longer report the plugin as missing on Claude Code 2.1.3xx, where `claude plugin list` uses a different pointer glyph that Windows PowerShell 5.1 garbles. The plugin entry is now matched by its `name@marketplace` line.
