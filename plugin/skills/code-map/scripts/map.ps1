@@ -35,7 +35,8 @@ $LangByExt = @{
     '.ts' = 'js'; '.tsx' = 'js'; '.ps1' = 'ps1'; '.psm1' = 'ps1'; '.rs' = 'rs'; '.dart' = 'dart'; '.php' = 'php'; '.go' = 'go'
 }
 $SkipDirs = @('node_modules', '.git', 'bin', 'obj', 'dist', 'build', 'target', 'venv', '.venv', '__pycache__', 'vendor', 'packages', '.roguekit', '.next', 'coverage', '.idea', '.vs', '.dart_tool')
-$Mods = '(?:(?:public|private|protected|internal|static|sealed|abstract|partial|override|virtual|async|unsafe|readonly|new|extern|final|synchronized|default)\s+)'
+$RulesVersion = 2
+$Mods ='(?:(?:public|private|protected|internal|static|sealed|abstract|partial|override|virtual|async|unsafe|readonly|new|extern|final|synchronized|default)\s+)'
 
 function New-Rule([string]$re, [string]$kind, [int]$ni, [int]$ki = 0) { return @{ re = $re; kind = $kind; ni = $ni; ki = $ki } }
 $SymRules = @{
@@ -83,7 +84,7 @@ $ImpRules = @{
     cs   = @('^\s*using\s+(?:static\s+)?([\w.]+)\s*;')
     java = @('^\s*import\s+(?:static\s+)?([\w.*]+)\s*;')
     py   = @('^\s*import\s+([\w.]+)', '^\s*from\s+([\w.]+)\s+import')
-    js   = @('\bfrom\s+[''"]([^''"]+)[''"]', '\brequire\(\s*[''"]([^''"]+)[''"]\s*\)', '^\s*import\s+[''"]([^''"]+)[''"]')
+    js   = @('^\s*(?:import|export)\b.*\bfrom\s+[''"]([^''"]+)[''"]', '^\s*\}\s*from\s+[''"]([^''"]+)[''"]','\brequire\(\s*[''"]([^''"]+)[''"]\s*\)', '^\s*import\s+[''"]([^''"]+)[''"]')
     ps1  = @('^\s*\.\s+[''"]?([^''"\s]+\.ps1)', '^\s*Import-Module\s+[''"]?([\w.\\/:-]+)')
     rs   = @('^\s*(?:pub\s+)?use\s+([\w:]+)')
     dart = @('^\s*import\s+[''"]([^''"]+)[''"]')
@@ -144,7 +145,11 @@ switch ($Action) {
     'Build' {
         $old = @{}
         if (Test-Path -LiteralPath $Map) {
-            try { foreach ($f in @((Get-Content -LiteralPath $Map -Raw | ConvertFrom-Json).files)) { $old[$f.p] = $f } } catch { $old = @{} }
+            # Entries are reused only when the map was built by the same rule set (bump $RulesVersion when rules change).
+            try {
+                $prev = Get-Content -LiteralPath $Map -Raw | ConvertFrom-Json
+                if ($prev.version -eq $RulesVersion) { foreach ($f in @($prev.files)) { $old[$f.p] = $f } }
+            } catch { $old = @{} }
         }
         $out = @()
         $reused = 0; $scanned = 0
@@ -159,7 +164,7 @@ switch ($Action) {
         }
         $dir = Split-Path -Parent $Map
         if (!(Test-Path -LiteralPath $dir)) { New-Item -ItemType Directory -Path $dir | Out-Null }
-        $doc = @{ version = 1; root = $Root; built = (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'); files = @($out | Sort-Object { $_.p }) }
+        $doc = @{ version = $RulesVersion; root = $Root; built = (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'); files = @($out | Sort-Object { $_.p }) }
         ConvertTo-Json -InputObject $doc -Depth 6 -Compress | Set-Content -LiteralPath $Map -Encoding UTF8
         $symCount = 0; foreach ($f in $out) { $symCount += @($f.s).Count }
         "Map built: $($out.Count) files ($scanned scanned, $reused unchanged), $symCount symbols"

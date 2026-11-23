@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.1
+
+- `code-map`: JavaScript/TypeScript import detection no longer matches the word "from" inside strings; the map now records a rules version so a rule change forces a full rescan instead of reusing stale entries.
+
 ## 1.6.0
 
 - New skill `code-map` with `map.ps1`: an offline, built-in codebase map (files, symbols, imports) with `Build`, `Find`, `Uses`, `Outline`, `Deps`, `Hubs` and `Status` queries for C#, Java, Python, JavaScript/TypeScript, PowerShell, Rust, Dart, PHP and Go. PowerShell only, no network, works in Constrained Language Mode; writes one file, `.roguekit/codemap.json`, inside the project. Regex-based, so results are pointers to confirm. Documented in `docs/code-map.md`.
