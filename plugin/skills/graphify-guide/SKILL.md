@@ -19,4 +19,4 @@ Graphify maps a project into a queryable graph (`graphify-out/graph.json`, `GRAP
 - Code parsing is local (tree-sitter). Docs, PDFs, images and video use a model for a semantic pass: ask the user before running that on private or large content, and note it may spend tokens or send content to the configured backend.
 - Do not run `graphify claude install` (per-project hook and instructions), `graphify hook install` (git hooks) or any Cloud sign-up without the user's approval for that repo.
 - Add `graphify-out/` to `.gitignore` unless the user wants the graph committed.
-- Tools live under the user's uv folder (the folder chosen at install, e.g. `D:\UV`, env `UV_*`). Update: `uv tool upgrade graphifyy`. Remove: `graphify uninstall`, then `uv tool uninstall graphifyy`.
+- RogueKit does not install or manage Graphify. If the user already has it, use their install; if they ask how to install or remove it, point them to Graphify's own documentation and let them choose the method. Do not download or install it on a managed or work device unless the user confirms that is permitted.

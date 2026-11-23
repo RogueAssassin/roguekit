@@ -1,7 +1,7 @@
 {
   "name": "roguekit",
   "description": "RogueKit: a lean, token-conscious toolkit for Claude Code. All content is plain files you can read before installing.",
-  "owner": { "name": "RogueKit contributors" },
+  "owner": { "name": "RogueKit Developers" },
   "plugins": [
     {
       "name": "roguekit",

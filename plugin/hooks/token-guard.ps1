@@ -1,6 +1,7 @@
 # RogueKit Token Saver - PreToolUse guard (Read, Bash).
 # Local only: reads the hook JSON from stdin, writes at most one JSON decision to stdout.
-# Fails OPEN: any error or unrecognised input allows the tool call.
+# No network, no files written, no child processes, no .NET static calls (works in PowerShell
+# Constrained Language Mode). Fails OPEN: any error or unrecognised input allows the tool call.
 # Disable: set ROGUEKIT_TOKEN_SAVER=off. Size limit: ROGUEKIT_READ_MAX_KB (default 150).
 # The legacy CLAUDEPACK_* names are still honoured.
 $ErrorActionPreference = 'Stop'
@@ -11,13 +12,13 @@ function Deny([string]$Reason) {
         permissionDecision       = 'deny'
         permissionDecisionReason = "RogueKit token saver: $Reason (set ROGUEKIT_TOKEN_SAVER=off to disable)"
     } }
-    [Console]::Out.Write(($out | ConvertTo-Json -Depth 5 -Compress))
+    Write-Output ($out | ConvertTo-Json -Depth 5 -Compress)
     exit 0
 }
 
 try {
     if ($env:ROGUEKIT_TOKEN_SAVER -eq 'off' -or $env:CLAUDEPACK_TOKEN_SAVER -eq 'off') { exit 0 }
-    $raw = [Console]::In.ReadToEnd()
+    $raw = ($input | Out-String)
     if ([string]::IsNullOrWhiteSpace($raw)) { exit 0 }
     $evt = $raw | ConvertFrom-Json
     $tool = [string]$evt.tool_name
@@ -34,7 +35,7 @@ try {
         if ($ranged) { exit 0 }
 
         $norm = $path -replace '\\', '/'
-        $name = [System.IO.Path]::GetFileName($path)
+        $name = Split-Path -Leaf $path
 
         if ($norm -match '/(node_modules|\.git/objects)/') {
             Deny "'$name' is inside a dependency/VCS-internal folder. Search for the specific symbol instead of reading it."
@@ -44,10 +45,11 @@ try {
             Deny "'$name' is a lockfile/minified/source-map file. Use grep for the specific entry, or Read with offset and limit."
         }
         if (Test-Path -LiteralPath $path -PathType Leaf) {
-            $ext = [System.IO.Path]::GetExtension($path).ToLowerInvariant()
+            $ext = ''
+            if ($name -match '(\.[^.]+)$') { $ext = $Matches[1].ToLowerInvariant() }
             # Images, PDFs and notebooks are handled by the Read tool itself.
             if ($ext -notin '.png', '.jpg', '.jpeg', '.gif', '.webp', '.pdf', '.ipynb') {
-                $kb = [math]::Round((Get-Item -LiteralPath $path).Length / 1KB)
+                $kb = [int]((Get-Item -LiteralPath $path).Length / 1KB)
                 if ($kb -gt $maxKb) {
                     Deny "'$name' is $kb KB (limit $maxKb KB) and no line range was given. Grep for what you need, or Read with offset and limit."
                 }

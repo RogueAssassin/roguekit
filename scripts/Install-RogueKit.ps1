@@ -30,11 +30,7 @@ param(
     [switch]$KeepOldPack,
     # Opt-in MCP servers (user scope). They run third-party npm packages and need Node.js.
     [ValidateSet('context7', 'playwright', 'chrome-devtools')]
-    [string[]]$McpServers = @(),
-    # Opt-in: uv + Python + Graphify CLI under -UvDir.
-    [switch]$WithGraphify,
-    [string]$UvDir = 'D:\UV',
-    [string]$PythonVersion = '3.12'
+    [string[]]$McpServers = @()
 )
 
 $ErrorActionPreference = 'Stop'
@@ -66,7 +62,7 @@ function Write-Utf8File([string]$Path, [string]$Content) {
 function Test-Claude { return [bool](Get-Command 'claude' -ErrorAction SilentlyContinue) }
 
 # ---------------------------------------------------------------------------
-# Optional extras (MCP servers, Graphify) and CLI helper
+# Optional extras (MCP servers) and CLI helper
 # ---------------------------------------------------------------------------
 $McpCatalog = @{
     'context7'        = @('@upstash/context7-mcp')                 # up-to-date library docs
@@ -100,76 +96,6 @@ function Install-McpServers {
             else { Write-Warning "Failed to add MCP server '$name': $($r.Output)" }
         }
     }
-}
-
-function Install-GraphifyStack {
-    [CmdletBinding(SupportsShouldProcess = $true)]
-    param()
-    $UvVersion = '0.13.7'   # pinned for reproducibility; change deliberately
-    $bin = Join-Path $UvDir 'bin'
-    $uv = Join-Path $bin 'uv.exe'
-    $dirs = [ordered]@{
-        UV_CACHE_DIR          = Join-Path $UvDir 'cache'
-        UV_PYTHON_INSTALL_DIR = Join-Path $UvDir 'python'
-        UV_TOOL_DIR           = Join-Path $UvDir 'tools'
-        UV_TOOL_BIN_DIR       = $bin
-        UV_PYTHON_BIN_DIR     = $bin
-    }
-    if (!$PSCmdlet.ShouldProcess($UvDir, "Install uv $UvVersion + Python $PythonVersion + graphifyy (PyPI) under this folder; set 5 UV_* user env vars and add '$bin' to the user PATH")) { return }
-
-    foreach ($d in (@($dirs.Values) + $bin)) { New-Item -ItemType Directory -Path $d -Force | Out-Null }
-    foreach ($k in $dirs.Keys) {
-        [Environment]::SetEnvironmentVariable($k, $dirs[$k], 'User')
-        Set-Item -Path "Env:$k" -Value $dirs[$k]
-    }
-    $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
-    if (($userPath -split ';') -notcontains $bin) {
-        [Environment]::SetEnvironmentVariable('Path', (($userPath.TrimEnd(';') + ';' + $bin).TrimStart(';')), 'User')
-        Write-Host "Added to user PATH: $bin"
-    }
-    if (($env:Path -split ';') -notcontains $bin) { $env:Path = "$bin;$env:Path" }
-
-    if (!(Test-Path -LiteralPath $uv)) {
-        $tmp = Join-Path ([IO.Path]::GetTempPath()) ("uv-dl-" + [guid]::NewGuid().ToString('N'))
-        New-Item -ItemType Directory -Path $tmp | Out-Null
-        try {
-            $base = "https://github.com/astral-sh/uv/releases/download/$UvVersion"
-            $zip = Join-Path $tmp 'uv-x86_64-pc-windows-msvc.zip'
-            Write-Host "Downloading $base/uv-x86_64-pc-windows-msvc.zip (about 15 MB)"
-            Invoke-WebRequest -Uri "$base/uv-x86_64-pc-windows-msvc.zip" -OutFile $zip -UseBasicParsing
-            $shaContent = (Invoke-WebRequest -Uri "$base/uv-x86_64-pc-windows-msvc.zip.sha256" -UseBasicParsing).Content
-            if ($shaContent -is [byte[]]) { $shaContent = [Text.Encoding]::UTF8.GetString($shaContent) }
-            $expected = (([string]$shaContent).Trim() -split '\s+')[0]
-            if ($expected -notmatch '^[0-9a-fA-F]{64}$') { throw "Could not read a valid SHA-256 from the published checksum file." }
-            $actual = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash
-            if ($actual -ne $expected.ToUpperInvariant()) { throw "uv download SHA-256 mismatch (expected $expected, got $actual). Aborting." }
-            Write-Host 'uv download SHA-256 verified.'
-            $ex = Join-Path $tmp 'x'
-            Expand-Archive -LiteralPath $zip -DestinationPath $ex -Force
-            Get-ChildItem -LiteralPath $ex -Recurse -Filter '*.exe' | ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination $bin -Force }
-        }
-        finally { Remove-Item -LiteralPath $tmp -Recurse -Force -ErrorAction SilentlyContinue }
-    }
-    if (!(Test-Path -LiteralPath $uv)) { throw "uv.exe not found at $uv after extraction." }
-    Write-Host ("uv: " + (& $uv --version))
-
-    function Invoke-Uv([string[]]$UvArgs) {
-        $prev = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
-        try { & $uv @UvArgs 2>&1 | ForEach-Object { Write-Host "  $_" }; if ($LASTEXITCODE -ne 0) { throw "uv $($UvArgs -join ' ') failed (exit $LASTEXITCODE)" } }
-        finally { $ErrorActionPreference = $prev }
-    }
-    Invoke-Uv @('python', 'install', $PythonVersion)
-    $prevEap = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
-    try { $tools = (& $uv tool list 2>&1 | ForEach-Object { "$_" } | Out-String) } finally { $ErrorActionPreference = $prevEap }
-    if ($tools -match '(?m)^graphifyy\b') { Write-Host 'graphifyy already installed (uv tool upgrade graphifyy to update).' }
-    else { Invoke-Uv @('tool', 'install', 'graphifyy', '--python', $PythonVersion) }
-
-    $gfy = Join-Path $bin 'graphify.exe'
-    if (!(Test-Path -LiteralPath $gfy)) { throw "graphify.exe not found at $gfy after install." }
-    Write-Host ("graphify: " + (& $gfy --version 2>&1))
-    $prev = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
-    try { & $gfy install 2>&1 | ForEach-Object { Write-Host "  $_" } } finally { $ErrorActionPreference = $prev }
-    Write-Host "Graphify ready. Per project, run 'graphify claude install' only where you want its hook; build with /graphify . inside Claude. Remove: graphify uninstall; uv tool uninstall graphifyy; delete $UvDir and the UV_* user env vars."
 }
 
 # ---------------------------------------------------------------------------
@@ -358,8 +284,12 @@ function Invoke-Doctor {
         if ($guard -and (Test-Path -LiteralPath $guard)) {
             $sample = '{"tool_name":"Bash","tool_input":{"command":"git log"}}'
             $prevOff = $env:ROGUEKIT_TOKEN_SAVER; $env:ROGUEKIT_TOKEN_SAVER = $null
-            try { $o = $sample | powershell -NoProfile -ExecutionPolicy Bypass -File $guard } finally { $env:ROGUEKIT_TOKEN_SAVER = $prevOff }
+            # Run it exactly as Claude Code does (no execution-policy override), so this reflects reality on managed machines.
+            try { $o = ($sample | powershell -NoProfile -NonInteractive -File $guard 2>&1 | Out-String) } finally { $env:ROGUEKIT_TOKEN_SAVER = $prevOff }
             if ($o -match '"deny"') { Out-Check 'PASS' 'Token-saver hook denies an unbounded "git log" as expected' }
+            elseif ($o -match 'running scripts is disabled|not digitally signed|PSSecurityException|UnauthorizedAccess') {
+                Out-Check 'WARN' 'PowerShell execution policy blocks the hook script, so the token saver is inactive (Claude still works). Ask your administrator to allow or sign it; see docs/managed-devices.md. Do not bypass policy on a managed device.'
+            }
             else { Out-Check 'FAIL' 'Token-saver hook did not deny an unbounded "git log"' }
         }
         else { Out-Check 'WARN' 'Could not locate the plugin hook script to test it' }
@@ -385,6 +315,15 @@ function Invoke-Doctor {
     }
     if ($dups.Count) { Out-Check 'WARN' ("User-level skills duplicate plugin skills: " + ($dups -join ', ') + ' (remove the user-level copies to avoid duplicate context)') }
     else { Out-Check 'PASS' 'No duplicate user-level skills' }
+
+    # The bundled helper scripts must exist and parse (catches a broken or partial download).
+    foreach ($rel in 'plugin\skills\free-model-assist\scripts\ask-free.ps1', 'plugin\skills\free-apis\scripts\lookup.ps1', 'plugin\hooks\token-guard.ps1') {
+        $sp = Join-Path $RepoRoot $rel
+        if (!(Test-Path -LiteralPath $sp)) { Out-Check 'FAIL' "Missing helper script: $rel"; continue }
+        $perr = $null; $ptok = $null
+        [void][System.Management.Automation.Language.Parser]::ParseFile($sp, [ref]$ptok, [ref]$perr)
+        if ($perr -and $perr.Count -gt 0) { Out-Check 'FAIL' "Helper script has syntax errors: $rel" } else { Out-Check 'PASS' "Helper script parses: $(Split-Path -Leaf $sp)" }
+    }
 
     if ($env:ROGUEKIT_TOKEN_SAVER -eq 'off' -or $env:CLAUDEPACK_TOKEN_SAVER -eq 'off') { Out-Check 'WARN' 'Token saver is switched off by environment variable' }
     Write-Host ("Result: {0} failure(s)" -f $script:fail)
@@ -412,8 +351,29 @@ function Invoke-Audit {
     }
     if (Test-Claude) {
         $pl = (Invoke-ClaudeCli @('plugin', 'list')).Output
-        $names = @([regex]::Matches($pl, '(?m)^\s*>\s*([^\s@]+)@(\S+)') | ForEach-Object { $_.Groups[1].Value })
+        # Entries start with a short pointer ('>' or a glyph that Windows PowerShell may garble); match the name@marketplace line.
+        $names = @([regex]::Matches($pl, '(?m)^\s*\S{1,3}\s+([^\s@]+)@(\S+)\s*\r?$') | ForEach-Object { $_.Groups[1].Value })
         Write-Host "Plugins: $($names.Count) installed"
+        $blk = Get-PluginBlock
+        if ($blk -and $blk -match 'Read from:\s*(.+)') {
+            $root = $Matches[1].Trim()
+            $cost = {
+                param($dir, $leaf)
+                $count = 0; $chars = 0
+                if (Test-Path -LiteralPath $dir) {
+                    foreach ($f in (Get-ChildItem -LiteralPath $dir -Recurse -Filter $leaf -File -ErrorAction SilentlyContinue)) {
+                        $t = Get-Content -LiteralPath $f.FullName -Raw
+                        if ($t -match '(?m)^name:\s*(.+)$') { $nm = $Matches[1].Trim() } else { $nm = '' }
+                        if ($t -match '(?m)^description:\s*(.+)$') { $ds = $Matches[1].Trim() } else { $ds = '' }
+                        $count++; $chars += $nm.Length + $ds.Length
+                    }
+                }
+                [PSCustomObject]@{ Count = $count; Tok = [int]($chars / 4) }
+            }
+            $sk = & $cost (Join-Path $root 'skills') 'SKILL.md'
+            $ag = & $cost (Join-Path $root 'agents') '*.md'
+            Write-Host ("RogueKit plugin descriptions: {0} skills ~{1} tok, {2} agents ~{3} tok, every session (bodies load only when used)" -f $sk.Count, $sk.Tok, $ag.Count, $ag.Tok)
+        }
         foreach ($n in $names) {
             $det = (Invoke-ClaudeCli @('plugin', 'details', $n)).Output
             $cost = if ($det -match '(?m)Always-on:\s*(.+)$') { $Matches[1].Trim() } else { 'n/a' }
@@ -442,7 +402,7 @@ switch ($Action) {
             Write-Host 'Removed RogueKit plugin and marketplace entry.'
         }
         Remove-RulesBlock -WhatIf:$WhatIfPreference
-        Write-Host ('Not removed (remove yourself if wanted): MCP servers (claude mcp remove <name>), Graphify/uv (graphify uninstall; uv tool uninstall graphifyy; delete the uv folder and UV_* variables), data folder ' + $DataDir)
+        Write-Host ('Not removed (remove yourself if wanted): MCP servers (claude mcp remove <name>), data folder ' + $DataDir)
         exit 0
     }
 }
@@ -453,7 +413,6 @@ if (!$KeepOldPack) { Invoke-OldPackMigration -WhatIf:$WhatIfPreference }
 if (!$SkipRules) { Set-RulesBlock -WhatIf:$WhatIfPreference } else { Write-Host 'Skipped rules block (-SkipRules).' }
 if (!$SkipPlugin) { Install-KitPlugin -WhatIf:$WhatIfPreference } else { Write-Host 'Skipped plugin (-SkipPlugin).' }
 Install-McpServers -Names $McpServers -WhatIf:$WhatIfPreference
-if ($WithGraphify) { Install-GraphifyStack -WhatIf:$WhatIfPreference }
 if (!$WhatIfPreference) {
     Write-Utf8File -Path (Join-Path $DataDir 'state.json') -Content ((@{ kit = $KitName; version = $KitVersion; installedAt = (Get-Date).ToString('o') } | ConvertTo-Json))
 }

@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.5.0
+
+- New skill `free-model-assist` with `ask-free.ps1`: hand small side tasks to free or local OpenAI-compatible APIs (Groq, OpenRouter, Gemini, NVIDIA, Mistral, GitHub Models, Cerebras, Ollama, LM Studio, custom). PowerShell only, nothing to install; optional DPAPI-encrypted key storage; HTTPS enforced; secret-looking prompts refused; ordered fallback and retry.
+- New skill `free-apis` with `lookup.ps1`: current package versions (npm, PyPI, NuGet, Maven, crates.io), vulnerabilities (OSV), end-of-life dates (endoflife.date) and GitHub releases. No keys, nothing written to disk.
+- New documentation set in `docs/`: skills, agents, hook and rules, installer, free model assist, free APIs, managed devices.
+- Managed-device hardening: the hook and helper scripts no longer need `-ExecutionPolicy Bypass`, work in PowerShell Constrained Language Mode, and avoid patterns endpoint-protection tools commonly flag. New `ROGUEKIT_OFFLINE=1` switch disables all remote lookups and remote models. `docs/managed-devices.md` documents files, network endpoints and what IT should review; compatibility with any specific security product cannot be guaranteed.
+- Removed `-WithGraphify`, uv and Python management from the installer; RogueKit no longer installs anything beyond the plugin. `graphify-guide` is now guidance only.
+- Installer: Audit regex fixed and now reports the token cost of plugin descriptions; Doctor checks the helper scripts and no longer bypasses execution policy.
+- New `scripts/Test-RogueKit.ps1` (structure, managed-device hygiene, secret and attribution scan, hook scenarios in both language modes, `ask-free.ps1` against a local fake provider; `-Action Manifest` prints SHA-256 hashes) and a GitHub Actions workflow that runs it. Added `SECURITY.md` and `CONTRIBUTING.md`.
+- New on-demand references for `security-review`, `api-automation` and `azure-cloud`.
+- `ask-free.ps1` honours `ROGUEKIT_HOME` (state folder override, used by tests).
+- `commsatlas` moved out of the shipped plugin into the CommsAtlas repository as a project skill. Copyright holder is now "RogueKit Developers".
+
 ## 1.4.0
 
 - New skills derived from the maintainer's repositories and sessions: `selfhosted-containers`, `linux-server-admin` (lockout-safe SSH port changes), `php-wordpress`, `flutter-dart`, `android-root-modules`.

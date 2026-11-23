@@ -9,3 +9,4 @@ description: Use for security audits, threat modelling, dependency review, authe
 - Prioritise findings by realistic impact and exploitability; include affected files and actionable remediation.
 - Distinguish confirmed vulnerabilities from hardening recommendations and assumptions.
 - Do not run exploit payloads against live systems or access data outside the authorised scope.
+- For a full review, read `references/checklist.md` in this skill folder.

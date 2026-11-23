@@ -1,8 +1,8 @@
 {
   "name": "roguekit",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Lean, token-conscious engineering skills, agents and a local token-saver hook for Claude Code. Sonnet by default, Opus on demand.",
-  "author": { "name": "RogueKit contributors" },
+  "author": { "name": "RogueKit Developers" },
   "license": "MIT",
   "keywords": ["skills", "agents", "token-saver", "dotnet", "java", "python", "rust", "powershell"]
 }

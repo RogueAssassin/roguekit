@@ -8,7 +8,7 @@ RogueKit is an independent community project. It is not affiliated with or endor
 
 | Part | What it is | Context cost |
 |---|---|---|
-| **Plugin `roguekit`** | 26 skills, 5 agents, 1 hook, installed through Claude Code's native plugin system | Skill/agent *descriptions* only; skill bodies load when used |
+| **Plugin `roguekit`** | 27 skills, 5 agents, 1 hook, installed through Claude Code's native plugin system | Skill/agent *descriptions* only; skill bodies load when used |
 | **Global rules** | One marked block appended to your `~/.claude/CLAUDE.md` (the one thing a plugin cannot ship) | About 1.3k tokens every session |
 | **Installer** | `scripts/Install-RogueKit.ps1`: install, doctor, audit, uninstall, optional extras | None |
 
@@ -30,7 +30,8 @@ Skills load on demand. Claude picks them when the task matches their description
 | `dotnet-csharp`, `java-development`, `python-development`, `rust-oxide-carbon`, `powershell-windows` | Language and platform guidance |
 | `frontend-ui-ux`, `sql-database`, `azure-cloud`, `api-automation`, `git-github-ci` | Frontend, data, cloud, APIs, Git/CI |
 | `game-server-tooling` | Dedicated game server managers, SteamCMD, RCON |
-| `commsatlas` | Coding, testing and releasing the CommsAtlas rack/patch documentation platform |
+| `free-model-assist` | Hand small side tasks to free or local model APIs (built-in PowerShell script, nothing to install) |
+| `free-apis` | Check current package versions, vulnerabilities, end-of-life dates and releases from free public APIs |
 | `selfhosted-containers`, `linux-server-admin` | Docker/Podman Compose services and update scripts; lockout-safe SSH, firewall, nginx, systemd, cleanup |
 | `php-wordpress`, `flutter-dart`, `android-root-modules` | WordPress/PHP plugins and themes; Flutter apps; Android root modules and companion apps |
 | `security-review`, `performance-review` | Security audits and profiling-led optimisation |
@@ -67,7 +68,6 @@ It makes no network requests, stores nothing, and lets the call through if anyth
 ```powershell
 git clone https://github.com/RogueAssassin/roguekit.git
 cd roguekit
-Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force   # this PowerShell window only
 .\scripts\Install-RogueKit.ps1 -WhatIf     # preview, changes nothing
 .\scripts\Install-RogueKit.ps1             # install
 ```
@@ -127,14 +127,18 @@ Sonnet is the baseline. Escalate for one hard step with the Opus agents or `/mod
 
 Choices: `context7` (current library docs), `playwright` (browser testing of an existing UI), `chrome-devtools` (live DOM/console/performance). They run third-party npm packages through `npx`, so **Node.js 18+ must be installed**, and each one adds tool definitions to every session. Add only what you need. Existing servers with the same name are preserved. Remove with `claude mcp remove <name>`.
 
-### Graphify (opt-in)
+### Free models and free APIs (built in, nothing to install)
 
-```powershell
-.\scripts\Install-RogueKit.ps1 -WithGraphify                  # default folder D:\UV
-.\scripts\Install-RogueKit.ps1 -WithGraphify -UvDir E:\UV
-```
+Two skills use small PowerShell scripts that ship inside the plugin. They need only the Windows PowerShell that comes with Windows: no Python, Node, proxy or background service, and no changes to your machine unless you save a key yourself.
 
-Installs uv 0.13.7 (downloaded from the official release, SHA-256 verified), Python 3.12 and the `graphifyy` package under `-UvDir`, sets five `UV_*` user environment variables, adds `<UvDir>\bin` to your user PATH, and runs `graphify install`. It builds no graph and adds no per-project hooks. It pays off on large or unfamiliar repos; measure before enabling it widely. See the `graphify-guide` skill.
+- `free-model-assist` lets Claude hand small, low-risk side tasks (summaries, drafts, second opinions) to **free or local model APIs** such as Groq, OpenRouter, Gemini, NVIDIA, Mistral, GitHub Models or Ollama. Keys are optional, stored encrypted for your Windows user if you choose, and prompts that look like secrets are refused. See [docs/free-model-assist.md](docs/free-model-assist.md).
+- `free-apis` lets Claude check **current facts** (latest package versions, known vulnerabilities, end-of-life dates, GitHub releases) from free public APIs with no key. See [docs/free-apis.md](docs/free-apis.md).
+
+Free models are weaker than Claude and free tiers change, so both tools send only what you approve and treat results as drafts to verify.
+
+## Documentation
+
+Everything RogueKit provides, with uses and examples, is in [docs/](docs/README.md): [skills](docs/skills.md), [agents](docs/agents.md), [hook and rules](docs/hook-and-rules.md), [installer](docs/installer.md), [free model assist](docs/free-model-assist.md), [free APIs](docs/free-apis.md).
 
 ## Monthly check
 
@@ -160,7 +164,7 @@ Restart Claude Code afterwards.
 .\scripts\Install-RogueKit.ps1 -Action Uninstall
 ```
 
-Removes the plugin, the marketplace entry and the managed rules block (with a backup). It does not remove MCP servers, Graphify/uv, or `~/.roguekit`; the command prints how to remove those.
+Removes the plugin, the marketplace entry and the managed rules block (with a backup). It does not remove MCP servers or `~/.roguekit`; the command prints how to remove those.
 
 ## Troubleshooting
 
@@ -172,11 +176,11 @@ Removes the plugin, the marketplace entry and the managed rules block (with a ba
 | Duplicate skills listed | An old copy exists under `~/.claude/skills`; Doctor lists them. Delete the user-level copies |
 | A read or `git log` was blocked | Read with `offset`/`limit`, or add `-n 20`. Temporarily: `$env:ROGUEKIT_TOKEN_SAVER='off'` |
 | MCP server fails to connect | Install Node.js 18+, then `claude mcp list` |
-| Script blocked by execution policy | Use the process-scoped `Set-ExecutionPolicy ... -Scope Process` line above |
+| Script blocked by execution policy | Your policy is doing its job. On your own PC, `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` is the usual setting. On a work or managed device, do not bypass it: ask your administrator, or use Option B (plugin only) and see [docs/managed-devices.md](docs/managed-devices.md) |
 
 ## Security and privacy
 
-- No telemetry, no network calls from the hook or installer (the optional Graphify step downloads from GitHub and PyPI, and MCP servers fetch npm packages, only when you opt in).
+- No telemetry, no network calls from the hook or installer (MCP servers fetch npm packages only if you opt in; the free-model and free-API helpers contact third-party services only when you or Claude run them, and can be switched off with `ROGUEKIT_OFFLINE=1`).
 - All content is plain text you can read before installing: `plugin/` (skills, agents, hook) and `rules/global-rules.md`.
 - Plugins and MCP servers run with your permissions. Review anything you add, including this repo.
 
@@ -187,11 +191,12 @@ Removes the plugin, the marketplace entry and the managed rules block (with a ba
 plugin/                           the plugin (skills, agents, hooks)
 rules/global-rules.md             text of the managed CLAUDE.md block
 scripts/Install-RogueKit.ps1      installer, doctor, audit, uninstall
+docs/                             full documentation
 ```
 
 ## Credits
 
-Ideas for the plan/test/review/verify workflow, session handoff and the lifecycle-style installer were inspired by the MIT-licensed [ECC](https://github.com/affaan-m/ecc) project. No ECC code or content is included.
+Ideas for the plan/test/review/verify workflow, session handoff and the lifecycle-style installer were inspired by the MIT-licensed [ECC](https://github.com/affaan-m/ecc) project. No ECC code or content is included. The free-model and free-API helpers follow a common community idea (see projects such as free-claude-code, AGPL); they are independent implementations and contain none of that code.
 
 ## License
 

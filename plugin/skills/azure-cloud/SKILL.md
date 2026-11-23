@@ -9,3 +9,4 @@ description: Use for Azure architecture, identity, networking, infrastructure as
 - Review cost, security, availability, observability and rollback implications before provisioning.
 - Distinguish development, test and production. Never deploy, delete or modify production resources without explicit approval.
 - Validate plans and deployment diffs before execution; prefer official vendor documentation.
+- For design or review, read `references/azure-checklist.md` in this skill folder.
