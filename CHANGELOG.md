@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.0
+
+- New skill `code-map` with `map.ps1`: an offline, built-in codebase map (files, symbols, imports) with `Build`, `Find`, `Uses`, `Outline`, `Deps`, `Hubs` and `Status` queries for C#, Java, Python, JavaScript/TypeScript, PowerShell, Rust, Dart, PHP and Go. PowerShell only, no network, works in Constrained Language Mode; writes one file, `.roguekit/codemap.json`, inside the project. Regex-based, so results are pointers to confirm. Documented in `docs/code-map.md`.
+- Doctor checks `map.ps1`; the self-test covers the new skill.
+
 ## 1.5.0
 
 - New skill `free-model-assist` with `ask-free.ps1`: hand small side tasks to free or local OpenAI-compatible APIs (Groq, OpenRouter, Gemini, NVIDIA, Mistral, GitHub Models, Cerebras, Ollama, LM Studio, custom). PowerShell only, nothing to install; optional DPAPI-encrypted key storage; HTTPS enforced; secret-looking prompts refused; ordered fallback and retry.

@@ -269,6 +269,42 @@ foreach ($k in $savedEnv.Keys) { if ($null -eq $savedEnv[$k]) { Remove-Item "Env
 Remove-Item -LiteralPath $tmpHome -Recurse -Force -ErrorAction SilentlyContinue
 
 # --------------------------------------------------------------------------------------------------
+Section 'code-map (map.ps1) on a temporary sample project'
+$MapScript = Join-Path $Plugin 'skills\code-map\scripts\map.ps1'
+$proj = Join-Path ([System.IO.Path]::GetTempPath()) ('rk_proj_' + [guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Path (Join-Path $proj 'src'), (Join-Path $proj 'web'), (Join-Path $proj 'node_modules\x') | Out-Null
+Set-Content -LiteralPath (Join-Path $proj 'src\OrderService.cs') -Value @('using System;', 'using MyApp.Data;', 'namespace MyApp.Orders', '{', '    public class OrderService : IOrderService', '    {', '        public async Task<Order> GetOrderAsync(int id) { return null; }', '    }', '}')
+Set-Content -LiteralPath (Join-Path $proj 'src\Caller.cs') -Value @('using MyApp.Orders;', 'public class Caller { void Run() { var s = new OrderService(); } }')
+Set-Content -LiteralPath (Join-Path $proj 'web\app.js') -Value @("import { util } from './util.js';", 'export function render() {}')
+Set-Content -LiteralPath (Join-Path $proj 'web\util.js') -Value @('export const util = (a) => a;')
+Set-Content -LiteralPath (Join-Path $proj 'tool.py') -Value @('import os', 'class Tool:', '    def run(self): pass')
+Set-Content -LiteralPath (Join-Path $proj 'node_modules\x\skip.js') -Value @('function ShouldBeSkipped() {}')
+function MapRun([string]$ArgText, [bool]$Clm) {
+    if ($Clm) {
+        $c = '$ExecutionContext.SessionState.LanguageMode = "ConstrainedLanguage"; & "' + $MapScript + '" ' + $ArgText + ' -Path "' + $proj + '"'
+        return (powershell -NoProfile -NonInteractive -Command $c 2>&1 | Out-String)
+    }
+    return (powershell -NoProfile -NonInteractive -Command ('& "' + $MapScript + '" ' + $ArgText + ' -Path "' + $proj + '"') 2>&1 | Out-String)
+}
+$o = MapRun '-Action Build' $false
+Check 'map: build finds 5 files and skips node_modules' ($o -match '5 files \(5 scanned' -and (Test-Path -LiteralPath (Join-Path $proj '.roguekit\codemap.json')))
+$o = MapRun '-Action Build' $false
+Check 'map: second build is incremental' ($o -match '0 scanned, 5 unchanged')
+Check 'map: find returns definition with line number' ((MapRun '-Action Find -Name OrderService' $false) -match 'OrderService\.cs:5\s+class OrderService')
+Check 'map: uses lists references' ((MapRun '-Action Uses -Name OrderService' $false) -match 'Caller\.cs:2')
+Check 'map: outline lists methods' ((MapRun '-Action Outline -File OrderService.cs' $false) -match 'method GetOrderAsync')
+Check 'map: deps finds importer by namespace' ((MapRun '-Action Deps -File OrderService.cs' $false) -match 'src/Caller\.cs')
+Check 'map: deps finds importer by relative module' ((MapRun '-Action Deps -File util.js' $false) -match 'web/app\.js')
+Check 'map: hubs lists imported modules' ((MapRun '-Action Hubs' $false) -match 'MyApp\.Orders')
+Check 'map: status reports current' ((MapRun '-Action Status' $false) -match 'Map is current')
+Check 'map: ignored folder not indexed' ((MapRun '-Action Find -Name ShouldBeSkipped' $false) -match 'No symbol')
+Check 'map (constrained language): find' ((MapRun '-Action Find -Name OrderService' $true) -match 'OrderService\.cs:5')
+Check 'map (constrained language): hubs and deps' (((MapRun '-Action Hubs' $true) -match 'MyApp\.Orders') -and ((MapRun '-Action Deps -File util.js' $true) -match 'web/app\.js'))
+Add-Content -LiteralPath (Join-Path $proj 'web\util.js') -Value 'export function extra() {}'
+Check 'map: status notices a changed file' ((MapRun '-Action Status' $false) -match '1 file\(s\) changed')
+Remove-Item -LiteralPath $proj -Recurse -Force -ErrorAction SilentlyContinue
+
+# --------------------------------------------------------------------------------------------------
 if ($Online) {
     Section 'lookup.ps1 against live public APIs (-Online)'
     $r = (powershell -NoProfile -NonInteractive -File $Lookup -Kind Package -Ecosystem npm -Name express 2>&1 | Out-String)

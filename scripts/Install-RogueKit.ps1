@@ -317,7 +317,7 @@ function Invoke-Doctor {
     else { Out-Check 'PASS' 'No duplicate user-level skills' }
 
     # The bundled helper scripts must exist and parse (catches a broken or partial download).
-    foreach ($rel in 'plugin\skills\free-model-assist\scripts\ask-free.ps1', 'plugin\skills\free-apis\scripts\lookup.ps1', 'plugin\hooks\token-guard.ps1') {
+    foreach ($rel in 'plugin\skills\free-model-assist\scripts\ask-free.ps1', 'plugin\skills\free-apis\scripts\lookup.ps1', 'plugin\skills\code-map\scripts\map.ps1', 'plugin\hooks\token-guard.ps1') {
         $sp = Join-Path $RepoRoot $rel
         if (!(Test-Path -LiteralPath $sp)) { Out-Check 'FAIL' "Missing helper script: $rel"; continue }
         $perr = $null; $ptok = $null

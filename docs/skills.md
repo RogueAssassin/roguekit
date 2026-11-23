@@ -1,6 +1,6 @@
 # Skills reference
 
-RogueKit ships **27 skills**. A skill's full text loads only when Claude decides it is relevant (or you invoke it by name, shown as `roguekit:<name>`). Until then only its one-line description is in context.
+RogueKit ships **28 skills**. A skill's full text loads only when Claude decides it is relevant (or you invoke it by name, shown as `roguekit:<name>`). Until then only its one-line description is in context.
 
 How to use any skill: describe the task normally, or name it ("use the dotnet-csharp skill to review this service"). Type `/` to see them. The *Example* column is a prompt that triggers it.
 
@@ -17,6 +17,7 @@ How to use any skill: describe the task normally, or name it ("use the dotnet-cs
 | `graphify-guide` | Whether and how to use Graphify (knowledge graph) on a large codebase. | "Is Graphify worth it for this repo?" |
 | `free-model-assist` | Hand small, low-risk side tasks (summaries, drafts, second opinions) to free or local model APIs with a built-in PowerShell script. Asks before sending anything. | "Get a second opinion from a free model on this error message." |
 | `free-apis` | Check current package versions, vulnerabilities (OSV), end-of-life dates and GitHub releases from free public APIs, no keys. | "What's the latest Django and is 3.2.0 vulnerable?" |
+| `code-map` | Build a compact map of a codebase (files, symbols, imports) and answer "where is X / what uses X / what imports this" without reading whole files. Offline, PowerShell only. | "Where is OrderService defined and what uses it?" |
 
 ## Languages and platforms
 

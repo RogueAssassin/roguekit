@@ -20,3 +20,4 @@ Graphify maps a project into a queryable graph (`graphify-out/graph.json`, `GRAP
 - Do not run `graphify claude install` (per-project hook and instructions), `graphify hook install` (git hooks) or any Cloud sign-up without the user's approval for that repo.
 - Add `graphify-out/` to `.gitignore` unless the user wants the graph committed.
 - RogueKit does not install or manage Graphify. If the user already has it, use their install; if they ask how to install or remove it, point them to Graphify's own documentation and let them choose the method. Do not download or install it on a managed or work device unless the user confirms that is permitted.
+- No install needed? For navigation (find definitions, usages, imports) without Graphify, use the built-in `code-map` skill: offline and PowerShell only, though regex-based and less accurate.
