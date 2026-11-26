@@ -8,7 +8,7 @@ RogueKit is an independent community project. It is not affiliated with or endor
 
 | Part | What it is | Context cost |
 |---|---|---|
-| **Plugin `roguekit`** | 28 skills, 5 agents, 1 hook, installed through Claude Code's native plugin system | Skill/agent *descriptions* only; skill bodies load when used |
+| **Plugin `roguekit`** | 28 skills, 6 agents, 1 hook, installed through Claude Code's native plugin system | Skill/agent *descriptions* only; skill bodies load when used |
 | **Global rules** | One marked block appended to your `~/.claude/CLAUDE.md` (the one thing a plugin cannot ship) | About 1.3k tokens every session |
 | **Installer** | `scripts/Install-RogueKit.ps1`: install, doctor, audit, uninstall, optional extras | None |
 
@@ -42,6 +42,7 @@ Skills load on demand. Claude picks them when the task matches their description
 | Agent | Model | Use it for |
 |---|---|---|
 | `code-reviewer` | Sonnet | Review a diff from a fresh context |
+| `ui-reviewer` | Sonnet | Review a page in a real browser and prioritise UI/UX fixes |
 | `debugger` | Sonnet | Reproduce and root-cause bugs |
 | `architect` | **Opus** | Architecture and migration design |
 | `deep-debugger` | **Opus** | Escalation for bugs that survived two fix attempts |

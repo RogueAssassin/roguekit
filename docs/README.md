@@ -5,7 +5,7 @@ Everything RogueKit provides, and when to use it.
 | Document | Covers |
 |---|---|
 | [skills.md](skills.md) | All 28 skills: what each is for, example prompts, context cost |
-| [agents.md](agents.md) | The 5 agents, models, when to delegate |
+| [agents.md](agents.md) | The 6 agents, models, when to delegate |
 | [hook-and-rules.md](hook-and-rules.md) | The token-saver hook and the global rules block in `CLAUDE.md` |
 | [installer.md](installer.md) | Install, Status, Doctor, Audit, Uninstall, options, updating |
 | [free-model-assist.md](free-model-assist.md) | Hand side tasks to free or local model APIs (providers, keys, safety) |
@@ -15,7 +15,7 @@ Everything RogueKit provides, and when to use it.
 ## What RogueKit is made of
 
 ```text
-plugin/                  the Claude Code plugin: 28 skills, 5 agents, 1 hook
+plugin/                  the Claude Code plugin: 28 skills, 6 agents, 1 hook
 rules/global-rules.md    text of the managed block added to ~/.claude/CLAUDE.md
 scripts/Install-RogueKit.ps1   installer, doctor, audit, uninstall
 docs/                    this documentation

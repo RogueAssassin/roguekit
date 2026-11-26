@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.7.0
+
+- `frontend-ui-ux` rebuilt around professional, natural-feeling UI: a workflow and definition of done, with new on-demand references for design foundations (tokens, hierarchy, spacing, type, colour), natural interaction (feedback, motion, forms, states, wording) and a browser review procedure.
+- New `ui-reviewer` agent: reviews a page in a real browser and returns prioritised fixes.
+
 ## 1.6.1
 
 - `code-map`: JavaScript/TypeScript import detection no longer matches the word "from" inside strings; the map now records a rules version so a rule change forces a full rescan instead of reusing stale entries.

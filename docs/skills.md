@@ -27,7 +27,7 @@ How to use any skill: describe the task normally, or name it ("use the dotnet-cs
 | `java-development` | Java, Spring Boot, Maven/Gradle, Hibernate. Includes quality and performance reference. | "Fix the N+1 query in this Spring service." |
 | `python-development` | Python apps, libraries, APIs, packaging, typing, tests. Includes quality and performance reference. | "Profile why this script is slow." |
 | `powershell-windows` | PowerShell scripts, installers, services, registry, deployment on Windows. Includes quality and performance reference. | "Review this installer script for PS 5.1 pitfalls." |
-| `frontend-ui-ux` | TypeScript/React frontends, accessibility, responsive UI. Includes quality and performance reference. | "Why does this list re-render on every keystroke?" |
+| `frontend-ui-ux` | Professional web UI: design foundations, natural interaction and motion, browser review, accessibility, responsive, React/TypeScript. On-demand references. | "Why does this list re-render on every keystroke?" |
 | `sql-database` | Schema design, queries, migrations, indexing, transactions. Includes quality and performance reference. | "Speed up this slow report query." |
 | `rust-oxide-carbon` | Facepunch Rust server plugins (Oxide/uMod, Carbon, Harmony), Oxide extensions, IDE project setup, plugin templates and review checklist. | "Write a Carbon plugin that gives a kit on first join." |
 | `azure-cloud` | Azure architecture, identity, networking, IaC, monitoring, cost. | "Design a cheap staging environment on Azure." |
